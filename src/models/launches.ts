@@ -1,6 +1,6 @@
 import { log, flatMap } from "../deps.ts";
 
-interface Launch {
+export interface Launch {
   flightNumber: number;
   mission: string;
   rocket: string;
@@ -68,7 +68,8 @@ export function removeOne(id: number) {
   return aborted;
 }
 
-export function addOne(data: Launch) {
+export function addOne(data: Launch | any) {
+  log.info(`Launch to add => ${data}`);
   launches.set(
     data.flightNumber,
     Object.assign(data, {

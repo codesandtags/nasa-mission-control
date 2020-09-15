@@ -9,6 +9,34 @@ app.use(api.routes());
 app.use(api.allowedMethods());
 
 /**
+ * Logging setup
+ */
+await log.setup({
+  handlers: {
+    console: new log.handlers.ConsoleHandler("INFO"),
+  },
+  loggers: {
+    default: {
+      level: "INFO",
+      handlers: ["console"],
+    },
+  },
+});
+
+app.addEventListener("error", (event) => {
+  log.error(event.error);
+});
+
+app.use(async (ctx, next) => {
+  try {
+    await next();
+  } catch (err) {
+    ctx.response.body = "Internal server error";
+    throw err;
+  }
+});
+
+/**
  * Send public files
  */
 app.use(async (ctx) => {
@@ -28,6 +56,9 @@ app.use(async (ctx) => {
   }
 });
 
-app.listen({
-  port: PORT,
-});
+if (import.meta.main) {
+  log.info(`Starting server on port ${PORT}...`);
+  await app.listen({
+    port: PORT,
+  });
+}
